@@ -13,7 +13,7 @@ const cardsRoutes = require('./routes/cards');
 const guestMiddleware = require('./middlewares/guest');
 const errorMiddleware = require('./middlewares/error');
 const notFoundMiddleware = require('./middlewares/notFound');
-const { BASE_API_DOMAIN, IS_PRODUCTION } = require('./utils/constants');
+const { FRONTEND_DOMAIN, IS_PRODUCTION } = require('./utils/constants');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUser, login } = require('./controllers/users');
 
@@ -29,7 +29,7 @@ if (IS_PRODUCTION) {
 
   app.use(helmet());
   app.use(cors({
-    origin: BASE_API_DOMAIN,
+    origin: FRONTEND_DOMAIN,
     optionsSuccessStatus: 200
   }));
   app.use(limiter);
