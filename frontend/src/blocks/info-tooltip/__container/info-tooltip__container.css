@@ -1,0 +1,13 @@
+.info-tooltip__container {
+  max-width: 430px;
+  width: 100%;
+  min-height: 330px;
+
+  background-color: #fff;
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

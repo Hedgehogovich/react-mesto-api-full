@@ -1,0 +1,9 @@
+.edit-form__submit_disabled {
+  padding: 13px 0;
+
+  background-color: transparent;
+  border: 1px solid #808080;
+  color: #808080;
+
+  cursor: default;
+}

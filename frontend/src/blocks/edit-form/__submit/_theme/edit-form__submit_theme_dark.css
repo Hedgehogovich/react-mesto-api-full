@@ -1,0 +1,13 @@
+.edit-form__submit_theme_dark {
+  background-color: #fff;
+  color: #000;
+
+  border-radius: 2px;
+}
+
+@media screen and (max-width: 540px) {
+  .edit-form__submit_theme_dark {
+    font-size: 16px;
+    line-height: 19px;
+  }
+}

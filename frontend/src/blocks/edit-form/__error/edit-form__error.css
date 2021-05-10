@@ -1,0 +1,8 @@
+.edit-form__error {
+  display: none;
+
+  font-size: 12px;
+  line-height: 15px;
+
+  color: #f00;
+}

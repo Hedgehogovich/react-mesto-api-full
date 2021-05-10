@@ -1,0 +1,9 @@
+.header__menu-toggle {
+  width: 24px;
+  height: 21px;
+
+  padding: 0;
+
+  background: transparent url('../../../images/icons/menu.svg') no-repeat center / contain;
+  border: none;
+}

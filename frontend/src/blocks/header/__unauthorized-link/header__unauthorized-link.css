@@ -1,0 +1,22 @@
+.header__unauthorized-link {
+  margin-top: 6px;
+
+  color: #fff;
+  text-decoration: none;
+
+  font-size: 18px;
+  line-height: 22px;
+
+  transition: opacity .1s linear;
+}
+
+.header__unauthorized-link:hover {
+  opacity: .6;
+}
+
+@media screen and (max-width: 540px) {
+  .header__unauthorized-link {
+    font-size: 14px;
+    line-height: 17px;
+  }
+}

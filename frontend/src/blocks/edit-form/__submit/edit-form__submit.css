@@ -1,0 +1,18 @@
+.edit-form__submit {
+  width: 100%;
+
+  padding: 14px 0;
+
+  border: none;
+
+  cursor: pointer;
+
+  font-size: 18px;
+  line-height: 22px;
+
+  transition: opacity .1s linear;
+}
+
+.edit-form__submit:hover {
+  opacity: .6;
+}

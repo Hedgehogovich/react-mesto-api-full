@@ -1,0 +1,19 @@
+.header__menu_mobile {
+  box-sizing: border-box;
+
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  border-bottom: 1px solid hsla(0, 0%, 33%, .7);
+
+  visibility: hidden;
+  height: 0;
+}
+
+@media screen and (max-width: 540px) {
+  .header__menu_mobile {
+    display: flex;
+  }
+}

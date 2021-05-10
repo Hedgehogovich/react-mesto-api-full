@@ -1,0 +1,13 @@
+.header__logo {
+  width: 142px;
+  height: 33px;
+
+  background: url('../../../images/icons/logo.svg') no-repeat center / contain;
+}
+
+@media screen and (max-width: 540px) {
+  .header__logo {
+    width: 103px;
+    height: 24px;
+  }
+}

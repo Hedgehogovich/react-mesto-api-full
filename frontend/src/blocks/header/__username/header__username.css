@@ -1,0 +1,18 @@
+.header__username {
+  color: #fff;
+
+  margin-right: 24px;
+
+  font-size: 18px;
+  line-height: 22px;
+
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+@media screen and (max-width: 540px) {
+  .header__username {
+    margin-right: 0;
+    margin-bottom: 18px;
+  }
+}

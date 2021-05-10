@@ -1,0 +1,12 @@
+.edit-form__title_theme_white {
+  margin: 0 0 38px 0;
+}
+
+@media screen and (max-width: 540px) {
+  .edit-form__title_theme_white {
+    font-size: 18px;
+    line-height: 22px;
+
+    margin-bottom: 63px;
+  }
+}

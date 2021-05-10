@@ -1,0 +1,13 @@
+.edit-form__field_theme_dark {
+  margin-bottom: 30px;
+}
+
+.edit-form__field_theme_dark:last-of-type {
+  margin-bottom: 216px;
+}
+
+@media screen and (max-width: 540px) {
+  .edit-form__field_theme_dark:last-of-type {
+    margin-bottom: 173px;
+  }
+}

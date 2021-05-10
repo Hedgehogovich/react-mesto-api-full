@@ -1,0 +1,11 @@
+.edit-form__submit_theme_white {
+  background-color: #000;
+  color: #fff;
+}
+
+@media screen and (max-width: 540px) {
+  .edit-form__submit_theme_white {
+    font-size: 14px;
+    line-height: 17px;
+  }
+}

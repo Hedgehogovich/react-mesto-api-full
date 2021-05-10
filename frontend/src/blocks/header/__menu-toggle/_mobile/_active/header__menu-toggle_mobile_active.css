@@ -1,0 +1,8 @@
+.header__menu-toggle_mobile_active {
+  width: 30px;
+  height: 30px;
+
+  background: transparent url('../../../../../images/icons/close.svg') no-repeat center / contain;
+
+  transform: rotate(45deg);
+}

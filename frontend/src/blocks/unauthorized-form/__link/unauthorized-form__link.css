@@ -1,0 +1,22 @@
+.unauthorized-form__link {
+  text-decoration: none;
+
+  font-size: 14px;
+  line-height: 17px;
+
+  color: #fff;
+
+  margin-top: 15px;
+  transition: opacity .1s linear;
+}
+
+.unauthorized-form__link:hover {
+  opacity: .6;
+}
+
+@media screen and (max-width: 540px) {
+  .unauthorized-form__link {
+    margin-top: 20px;
+  }
+}
+

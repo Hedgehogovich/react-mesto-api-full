@@ -1,0 +1,12 @@
+.header__menu_desktop {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 6px;
+}
+
+@media screen and (max-width: 540px) {
+  .header__menu_desktop {
+    display: none;
+  }
+}

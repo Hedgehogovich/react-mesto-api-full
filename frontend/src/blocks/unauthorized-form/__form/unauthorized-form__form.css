@@ -1,0 +1,15 @@
+.unauthorized-form__form {
+  max-width: 358px;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (max-width: 540px) {
+  .unauthorized-form__form {
+    max-width: 260px;
+  }
+}
