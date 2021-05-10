@@ -234,7 +234,8 @@ function App() {
 
     authApi.signIn(formData)
       .then(authorizeUser)
-      .catch(handleGuestRouteRequestError);
+      .catch(handleGuestRouteRequestError)
+      .finally(() => setIsLoginRequestInProcess(false));
   }
 
   function handleSignOutConfirmation() {
