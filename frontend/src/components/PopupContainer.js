@@ -1,6 +1,6 @@
 import {useEffect} from 'react';
 
-import {ESCAPE_BUTTON_KEY} from '../utils/utils';
+import {ESCAPE_BUTTON_KEY} from '../utils/constants';
 
 function PopupContainer({
   isOpen,

@@ -5,7 +5,7 @@ import UiForm from './form/UiForm';
 
 import useForm from '../hooks/useForm';
 
-import {FORM_WHITE_THEME} from '../utils/utils';
+import {FORM_WHITE_THEME} from '../utils/constants';
 
 function PopupWithForm({
   name,

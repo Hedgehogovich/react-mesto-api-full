@@ -47,6 +47,7 @@ function App() {
   const [isRegisterRequestInProcess, setIsRegisterRequestInProcess] = useState(false);
   const [isLoginRequestInProcess, setIsLoginRequestInProcess] = useState(false);
 
+  const [isInitialLoadPerformed, setIsInitialLoadPerformed] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [cards, setCards] = useState([]);
 
@@ -216,7 +217,7 @@ function App() {
   }
 
   const authorizeUser = useCallback(() => {
-    authApi.getUser()
+    return authApi.getUser()
       .then(setCurrentUser)
       .catch(resetAuthorization)
       .finally(() => {
@@ -259,7 +260,9 @@ function App() {
   }
 
   useEffect(() => {
-    authorizeUser();
+    authorizeUser().then(() => {
+      setIsInitialLoadPerformed(true);
+    });
   }, [authorizeUser]);
 
   useEffect(() => {
@@ -275,34 +278,36 @@ function App() {
       <CurrentUserContext.Provider value={currentUser}>
         <div className="page__content">
           <Header onSignOut={handleSignOut} />
-          <Switch>
-            <ProtectedRoute
-              component={Main}
-              path="/"
-              exact
-              onAddPlace={handleAddPlaceClick}
-              onEditAvatar={handleEditAvatarClick}
-              onEditProfile={handleEditProfileClick}
-              onCardClick={handleCardClick}
-              onCardDelete={handleCardDelete}
-              onCardLike={handleCardLike}
-              cards={cards}
-            />
-            <NotAuthorizedProtectedRoute
-              component={Login}
-              path="/sign-in"
-              onSubmit={handleLogin}
-              isLoading={isLoginRequestInProcess}
-              className="page__form"
-            />
-            <NotAuthorizedProtectedRoute
-              component={Register}
-              path="/sign-up"
-              onSubmit={handleRegistration}
-              isLoading={isRegisterRequestInProcess}
-              className="page__form"
-            />
-          </Switch>
+          {isInitialLoadPerformed && (
+            <Switch>
+              <ProtectedRoute
+                component={Main}
+                path="/"
+                exact
+                onAddPlace={handleAddPlaceClick}
+                onEditAvatar={handleEditAvatarClick}
+                onEditProfile={handleEditProfileClick}
+                onCardClick={handleCardClick}
+                onCardDelete={handleCardDelete}
+                onCardLike={handleCardLike}
+                cards={cards}
+              />
+              <NotAuthorizedProtectedRoute
+                component={Login}
+                path="/sign-in"
+                onSubmit={handleLogin}
+                isLoading={isLoginRequestInProcess}
+                className="page__form"
+              />
+              <NotAuthorizedProtectedRoute
+                component={Register}
+                path="/sign-up"
+                onSubmit={handleRegistration}
+                isLoading={isRegisterRequestInProcess}
+                className="page__form"
+              />
+            </Switch>
+          )}
           {currentUser && <Footer />}
         </div>
         <EditProfilePopup

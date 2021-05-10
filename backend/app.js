@@ -44,7 +44,7 @@ if (IS_PRODUCTION) {
   app.use(limiter);
   app.use(requestLogger);
 }
-app.listen(3000);
+app.listen(process.env.LISTEN_PORT || 3000);
 
 app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);

@@ -1,6 +1,6 @@
 import {Children, createElement, forwardRef} from 'react';
 import FormThemeContext from '../../contexts/FormThemeContext';
-import {FORM_WHITE_THEME} from '../../utils/utils';
+import {FORM_WHITE_THEME} from '../../utils/constants';
 
 function UiForm({
   children,

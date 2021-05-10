@@ -5,7 +5,7 @@ import UiInput from './form/UiInput';
 
 import useForm from '../hooks/useForm';
 
-import {FORM_DARK_THEME} from '../utils/utils';
+import {FORM_DARK_THEME} from '../utils/constants';
 
 function Register({onSubmit, isLoading}) {
   const {
