@@ -10,6 +10,7 @@ const {
   MONGODB_DUPLICATE_ERROR_CODE,
   ENCRYPTION_KEY,
   JWT_SESSION_COOKIE,
+  SET_COOKIE_PARAMS,
 } = require('../utils/constants');
 
 module.exports.getUsers = (req, res, next) => {
@@ -129,9 +130,7 @@ module.exports.login = (req, res, next) => {
 
       res.cookie(JWT_SESSION_COOKIE, token, {
         maxAge: 604800,
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
+        ...SET_COOKIE_PARAMS,
       }).end();
     })
     .catch((err) => {
@@ -140,6 +139,6 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.logout = (req, res) => {
-  res.clearCookie(JWT_SESSION_COOKIE);
+  res.clearCookie(JWT_SESSION_COOKIE, SET_COOKIE_PARAMS);
   res.send(200);
 };

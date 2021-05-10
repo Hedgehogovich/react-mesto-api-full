@@ -5,6 +5,11 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL;
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 const JWT_SESSION_COOKIE = 'jwt';
+const SET_COOKIE_PARAMS = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'None',
+};
 
 module.exports = {
   BCRYPT_SALT_ROUNDS,
@@ -14,4 +19,5 @@ module.exports = {
   IS_PRODUCTION,
   ENCRYPTION_KEY,
   JWT_SESSION_COOKIE,
+  SET_COOKIE_PARAMS,
 };
