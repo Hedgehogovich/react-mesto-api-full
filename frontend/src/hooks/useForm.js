@@ -65,7 +65,7 @@ function useForm() {
       const defaultValue = defaultValues?.[input.name] || '';
 
       input.value = defaultValue;
-      setStateValue(defaultValue);
+      setStateValue(input, defaultValue);
     });
 
     updateValidation();

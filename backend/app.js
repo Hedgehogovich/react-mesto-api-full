@@ -13,29 +13,10 @@ const cardsRoutes = require('./routes/cards');
 const guestMiddleware = require('./middlewares/guest');
 const errorMiddleware = require('./middlewares/error');
 const notFoundMiddleware = require('./middlewares/notFound');
-const { PRODUCTION_FRONTEND_ORIGIN, IS_PRODUCTION } = require('./utils/constants');
+const authMiddleware = require('./middlewares/auth');
+const { FRONTEND_ORIGIN, IS_PRODUCTION } = require('./utils/constants');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { createUser, login } = require('./controllers/users');
-
-const app = express();
-app.use(express.json());
-app.use(cookieParser());
-
-if (IS_PRODUCTION) {
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-  });
-
-  app.use(helmet());
-  app.use(cors({
-    origin: PRODUCTION_FRONTEND_ORIGIN,
-    optionsSuccessStatus: 200
-  }));
-  app.use(limiter);
-} else {
-  app.use(cors());
-}
+const { createUser, login, logout } = require('./controllers/users');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -44,10 +25,26 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.listen(3000);
+const app = express();
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
+  optionsSuccessStatus: 200,
+}));
+
 if (IS_PRODUCTION) {
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  });
+
+  app.use(helmet());
+  app.use(limiter);
   app.use(requestLogger);
 }
+app.listen(3000);
 
 app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);
@@ -93,6 +90,7 @@ app.post('/signup', guestMiddleware, celebrate({
     }),
   }),
 }), createUser);
+app.post('/signout', authMiddleware, logout);
 
 if (IS_PRODUCTION) {
   app.use(errorLogger);

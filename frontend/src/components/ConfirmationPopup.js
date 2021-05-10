@@ -1,8 +1,8 @@
 import PopupWithForm from './PopupWithForm';
 
-function CardDeleteConfirmationPopup({isOpen, onClose, onCardDeleteConfirmation, isLoading}) {
+function ConfirmationPopup({isOpen, onClose, onConfirmation, isLoading}) {
   function handleSubmit() {
-    onCardDeleteConfirmation();
+    onConfirmation();
   }
 
   return (
@@ -18,4 +18,4 @@ function CardDeleteConfirmationPopup({isOpen, onClose, onCardDeleteConfirmation,
   )
 }
 
-export default CardDeleteConfirmationPopup;
+export default ConfirmationPopup;

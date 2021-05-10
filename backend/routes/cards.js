@@ -37,7 +37,7 @@ router.post('/', authMiddleware, celebrate({
   }),
 }), createCard);
 router.delete('/:cardId', authMiddleware, cardIdValidator, deleteCard);
-router.put('/:cardId/likes', authMiddleware, cardIdValidator, addLike);
-router.delete('/:cardId/likes', authMiddleware, cardIdValidator, dislikeLike);
+router.put('/likes/:cardId', authMiddleware, cardIdValidator, addLike);
+router.delete('/likes/:cardId', authMiddleware, cardIdValidator, dislikeLike);
 
 module.exports = router;

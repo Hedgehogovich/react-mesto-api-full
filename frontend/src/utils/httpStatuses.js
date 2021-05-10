@@ -1,0 +1,9 @@
+const BAD_REQUEST = 400;
+const UNAUTHORIZED = 401;
+const CONFLICT = 409;
+
+export {
+  BAD_REQUEST,
+  UNAUTHORIZED,
+  CONFLICT
+};

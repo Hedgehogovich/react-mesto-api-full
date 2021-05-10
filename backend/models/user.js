@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema({
       message: (props) => `${props.value} не является корректной ссылкой`,
     },
   },
+  __v: {
+    type: Number,
+    select: false,
+  },
 });
 
 userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password) {

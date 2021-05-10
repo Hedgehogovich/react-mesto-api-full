@@ -3,6 +3,8 @@ const { ForbiddenError } = require('../utils/errors/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
+    .sort('-createdAt')
+    .limit(30)
     .then((cards) => res.send({ data: cards }))
     .catch(next);
 };

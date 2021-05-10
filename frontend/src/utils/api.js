@@ -2,12 +2,6 @@ import IApi from './IApi';
 import {BASE_API_URL} from './utils';
 
 class Api extends IApi {
-  getAuthorizedUser() {
-    return this._makeRequest({
-      action: '/users/me'
-    }).then(this._getJsonFromResponse);
-  }
-
   getCards() {
     return this._makeRequest({
       action: '/cards',

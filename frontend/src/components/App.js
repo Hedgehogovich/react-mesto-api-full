@@ -8,7 +8,7 @@ import ImagePopup from './ImagePopup';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
-import CardDeleteConfirmationPopup from './CardDeleteConfirmationPopup';
+import ConfirmationPopup from './ConfirmationPopup';
 import Login from './Login';
 import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
@@ -16,11 +16,11 @@ import NotAuthorizedProtectedRoute from './NotAuthorizedProtectedRoute';
 import InfoTooltip from './InfoTooltip';
 
 import CurrentUserContext from '../contexts/CurrentUserContext';
-import CurrentUserEmailContext from '../contexts/CurrentUserEmailContext';
 
 import {api} from '../utils/api';
 import {authApi} from '../utils/authApi';
-import {AUTH_STORAGE_TOKEN_KEY} from '../utils/utils';
+
+import {BAD_REQUEST, CONFLICT, UNAUTHORIZED} from '../utils/httpStatuses';
 
 function App() {
   const history = useHistory();
@@ -34,48 +34,57 @@ function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isAvatarUpdating, setIsAvatarUpdating] = useState(false);
 
-  const [cardToDelete, setCardToDelete] = useState(null);
-  const [isCardDeleting, setIsCardDeleting] = useState(false);
+  const [confirmationCallback, setConfirmationCallback] = useState(null);
+  const [isConfirmationRequestInProgress, setIsConfirmationRequestInProgress] = useState(false);
 
   const [isLikeRequestInProcess, setIsLikeRequestInProcess] = useState(false);
 
-  const [currentUser, setCurrentUser] = useState(null);
-  const [currentUserEmail, setCurrentUserEmail] = useState('');
-  const [cards, setCards] = useState([]);
   const [selectedPreviewCard, setSelectedPreviewCard] = useState(null);
 
-  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
-  const [isRequestSuccessful, setIsRequestSuccessful] = useState(false);
+  const [infoTooltipMessage, setInfoTooltipMessage] = useState('');
+  const [isTooltipSuccessful, setIsTooltipSuccessful] = useState(false);
 
   const [isRegisterRequestInProcess, setIsRegisterRequestInProcess] = useState(false);
   const [isLoginRequestInProcess, setIsLoginRequestInProcess] = useState(false);
 
+  const [currentUser, setCurrentUser] = useState(null);
+  const [cards, setCards] = useState([]);
+
+  function resetAuthorization() {
+    setCurrentUser(null);
+    setCards([]);
+  }
+
   function handleRequestError(error) {
-    console.error(error);
-    setIsRequestSuccessful(false);
-    setIsInfoTooltipOpen(true);
-  }
-
-  function handleRequestSuccess() {
-    setIsRequestSuccessful(true);
-    setIsInfoTooltipOpen(true);
-  }
-
-  const authorizeUser = useCallback(() => {
-    const token = localStorage.getItem(AUTH_STORAGE_TOKEN_KEY);
-
-    if (token) {
-      authApi.getUser(token)
-        .then(({data: {email}}) => setCurrentUserEmail(email))
-        .catch(error => {
-          localStorage.removeItem(AUTH_STORAGE_TOKEN_KEY);
-          handleRequestError(error);
-        })
-        .finally(() => {
-          setIsLoginRequestInProcess(false);
-        });
+    setIsTooltipSuccessful(false);
+    switch (error.status) {
+      case BAD_REQUEST:
+      case CONFLICT:
+        setInfoTooltipMessage(error.message);
+        break;
+      default:
+        console.error(error);
+        setInfoTooltipMessage('Что-то пошло не так! Попробуйте ещё раз.');
+        break;
     }
-  }, [])
+  }
+
+  const handleAuthorizedRouteRequestError = useCallback((error) => {
+    if (error.status === UNAUTHORIZED) {
+      resetAuthorization();
+    } else {
+      handleRequestError(error);
+    }
+  }, []);
+
+  function handleGuestRouteRequestError(error) {
+    if (error.status === UNAUTHORIZED) {
+      setIsTooltipSuccessful(false);
+      setInfoTooltipMessage(error.message);
+    } else {
+      handleRequestError(error);
+    }
+  }
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -93,10 +102,6 @@ function App() {
     setSelectedPreviewCard(card);
   }
 
-  function handleCardDelete(card) {
-    setCardToDelete(card);
-  }
-
   function handleUpdateProfile(userData) {
     if (isProfileUpdating) {
       return;
@@ -108,7 +113,7 @@ function App() {
         setCurrentUser(updatedUserData);
         setIsEditProfilePopupOpen(false);
       })
-      .catch(console.error)
+      .catch(handleAuthorizedRouteRequestError)
       .finally(() => setIsProfileUpdating(false));
   }
 
@@ -123,7 +128,7 @@ function App() {
         setCurrentUser(updatedUserData);
         setIsEditAvatarPopupOpen(false);
       })
-      .catch(console.error)
+      .catch(handleAuthorizedRouteRequestError)
       .finally(() => setIsAvatarUpdating(false));
   }
 
@@ -139,7 +144,7 @@ function App() {
         setCards(state => [newCardData, ...state]);
         setIsAddPlacePopupOpen(false);
       })
-      .catch(console.error)
+      .catch(handleAuthorizedRouteRequestError)
       .finally(() => setIsPlaceAdding(false));
   }
 
@@ -158,28 +163,40 @@ function App() {
           return state.map(stateCard => stateCard._id === cardId ? updatedCardData : stateCard);
         });
       })
-      .catch(console.error)
+      .catch(handleAuthorizedRouteRequestError)
       .finally(() => setIsLikeRequestInProcess(false));
   }
 
-  function handleCardDeleteConfirmation() {
-    if (isCardDeleting) {
+  function handleConfirmation() {
+    if (isConfirmationRequestInProgress) {
       return;
     }
 
-    setIsCardDeleting(true);
+    setIsConfirmationRequestInProgress(true);
+    confirmationCallback()
+      .finally(() => setIsConfirmationRequestInProgress(false));
+  }
 
-    const {_id: cardId} = cardToDelete;
+  function handleCardDeleteConfirmation(card) {
+    const {_id: cardId} = card;
 
-    api.removeCard(cardId)
+    return api.removeCard(cardId)
       .then(() => {
         setCards(state => {
           return state.filter(stateCard => stateCard._id !== cardId);
         });
-        setCardToDelete(null);
+        setConfirmationCallback(null);
       })
-      .catch(console.error)
-      .finally(() => setIsCardDeleting(false));
+      .catch(handleAuthorizedRouteRequestError);
+  }
+
+  function handleCardDelete(card) {
+    setConfirmationCallback(() => () => handleCardDeleteConfirmation(card));
+  }
+
+  function handleRegistrationSuccess() {
+    setIsTooltipSuccessful(true);
+    setInfoTooltipMessage('Вы успешно зарегистрировались!');
   }
 
   function handleRegistration(formData) {
@@ -191,12 +208,21 @@ function App() {
 
     authApi.signUp(formData)
       .then(() => {
-        handleRequestSuccess();
+        handleRegistrationSuccess();
         history.push('/sign-in');
       })
-      .catch(handleRequestError)
+      .catch(handleGuestRouteRequestError)
       .finally(() => setIsRegisterRequestInProcess(false));
   }
+
+  const authorizeUser = useCallback(() => {
+    authApi.getUser()
+      .then(setCurrentUser)
+      .catch(resetAuthorization)
+      .finally(() => {
+        setIsLoginRequestInProcess(false);
+      });
+  }, []);
 
   function handleLogin(formData) {
     if (isLoginRequestInProcess) {
@@ -206,20 +232,21 @@ function App() {
     setIsLoginRequestInProcess(true);
 
     authApi.signIn(formData)
-      .then(({token}) => {
-        localStorage.setItem(AUTH_STORAGE_TOKEN_KEY, token);
-        authorizeUser();
+      .then(authorizeUser)
+      .catch(handleGuestRouteRequestError);
+  }
+
+  function handleSignOutConfirmation() {
+    return authApi.signOut()
+      .then(() => {
+        setConfirmationCallback(null);
+        resetAuthorization();
       })
-      .catch(error => {
-        handleRequestError(error);
-        setIsLoginRequestInProcess(false);
-      });
+      .catch(handleAuthorizedRouteRequestError);
   }
 
   function handleSignOut() {
-    setCurrentUserEmail('');
-    setCurrentUser(null);
-    localStorage.removeItem(AUTH_STORAGE_TOKEN_KEY);
+    setConfirmationCallback(() => handleSignOutConfirmation);
   }
 
   function closeAllPopups() {
@@ -227,96 +254,90 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setSelectedPreviewCard(null);
-    setCardToDelete(null);
-    setIsInfoTooltipOpen(false);
+    setInfoTooltipMessage('');
+    setConfirmationCallback(null);
   }
 
   useEffect(() => {
     authorizeUser();
-  }, [authorizeUser])
+  }, [authorizeUser]);
 
   useEffect(() => {
-    if (currentUserEmail) {
-      api.getAuthorizedUser()
-        .then(setCurrentUser)
-        .catch(console.error);
-
+    if (currentUser) {
       api.getCards()
         .then(setCards)
-        .catch(console.error);
+        .catch(handleAuthorizedRouteRequestError);
     }
-  }, [currentUserEmail]);
+  }, [currentUser, handleAuthorizedRouteRequestError]);
 
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
-        <CurrentUserEmailContext.Provider value={currentUserEmail}>
-          <div className="page__content">
-            <Header onSignOut={handleSignOut} />
-            <Switch>
-              <ProtectedRoute
-                component={Main}
-                path="/"
-                exact
-                onAddPlace={handleAddPlaceClick}
-                onEditAvatar={handleEditAvatarClick}
-                onEditProfile={handleEditProfileClick}
-                onCardClick={handleCardClick}
-                onCardDelete={handleCardDelete}
-                onCardLike={handleCardLike}
-                cards={cards}
-              />
-              <NotAuthorizedProtectedRoute
-                component={Login}
-                path="/sign-in"
-                onSubmit={handleLogin}
-                isLoading={isLoginRequestInProcess}
-                className="page__form"
-              />
-              <NotAuthorizedProtectedRoute
-                component={Register}
-                path="/sign-up"
-                onSubmit={handleRegistration}
-                isLoading={isRegisterRequestInProcess}
-                className="page__form"
-              />
-            </Switch>
-            {currentUser && <Footer />}
-          </div>
-          <EditProfilePopup
-            isOpen={isEditProfilePopupOpen}
-            onClose={closeAllPopups}
-            onUpdateUser={handleUpdateProfile}
-            isLoading={isProfileUpdating}
-          />
-          <AddPlacePopup
-            isOpen={isAddPlacePopupOpen}
-            onClose={closeAllPopups}
-            onAddPlace={handleAddPlace}
-            isLoading={isPlaceAdding}
-          />
-          <EditAvatarPopup
-            isOpen={isEditAvatarPopupOpen}
-            onClose={closeAllPopups}
-            onUpdateAvatar={handleUpdateAvatar}
-            isLoading={isAvatarUpdating}
-          />
-          <CardDeleteConfirmationPopup
-            isOpen={!!cardToDelete}
-            onClose={closeAllPopups}
-            onCardDeleteConfirmation={handleCardDeleteConfirmation}
-            isLoading={isCardDeleting}
-          />
-          <ImagePopup
-            card={selectedPreviewCard}
-            onClose={closeAllPopups}
-          />
-          <InfoTooltip
-            isOpen={isInfoTooltipOpen}
-            onClose={closeAllPopups}
-            isSuccessful={isRequestSuccessful}
-          />
-        </CurrentUserEmailContext.Provider>
+        <div className="page__content">
+          <Header onSignOut={handleSignOut} />
+          <Switch>
+            <ProtectedRoute
+              component={Main}
+              path="/"
+              exact
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onEditProfile={handleEditProfileClick}
+              onCardClick={handleCardClick}
+              onCardDelete={handleCardDelete}
+              onCardLike={handleCardLike}
+              cards={cards}
+            />
+            <NotAuthorizedProtectedRoute
+              component={Login}
+              path="/sign-in"
+              onSubmit={handleLogin}
+              isLoading={isLoginRequestInProcess}
+              className="page__form"
+            />
+            <NotAuthorizedProtectedRoute
+              component={Register}
+              path="/sign-up"
+              onSubmit={handleRegistration}
+              isLoading={isRegisterRequestInProcess}
+              className="page__form"
+            />
+          </Switch>
+          {currentUser && <Footer />}
+        </div>
+        <EditProfilePopup
+          isOpen={isEditProfilePopupOpen}
+          onClose={closeAllPopups}
+          onUpdateUser={handleUpdateProfile}
+          isLoading={isProfileUpdating}
+        />
+        <AddPlacePopup
+          isOpen={isAddPlacePopupOpen}
+          onClose={closeAllPopups}
+          onAddPlace={handleAddPlace}
+          isLoading={isPlaceAdding}
+        />
+        <EditAvatarPopup
+          isOpen={isEditAvatarPopupOpen}
+          onClose={closeAllPopups}
+          onUpdateAvatar={handleUpdateAvatar}
+          isLoading={isAvatarUpdating}
+        />
+        <ConfirmationPopup
+          isOpen={!!confirmationCallback}
+          onClose={closeAllPopups}
+          onConfirmation={handleConfirmation}
+          isLoading={isConfirmationRequestInProgress}
+        />
+        <ImagePopup
+          card={selectedPreviewCard}
+          onClose={closeAllPopups}
+        />
+        <InfoTooltip
+          message={infoTooltipMessage}
+          onClose={closeAllPopups}
+          isSuccessful={isTooltipSuccessful}
+        />
       </CurrentUserContext.Provider>
     </div>
   );

@@ -1,7 +1,13 @@
+import FetchError from './FetchError';
+
 class IApi {
   constructor({baseUrl, headers}) {
     this._baseUrl = baseUrl;
     this._headers = headers;
+    this._makeRequest = this._makeRequest.bind(this);
+    this._getJsonFromResponse = this._getJsonFromResponse.bind(this);
+    this._getOkStatusFromResponse = this._getOkStatusFromResponse.bind(this);
+    this._formError = this._formError.bind(this);
   }
 
   _makeRequest({
@@ -17,6 +23,7 @@ class IApi {
     const requestParams = {
       method,
       headers: {...this._headers, ...headers},
+      credentials: 'include'
     };
 
     let url = this._baseUrl + action;
@@ -34,14 +41,18 @@ class IApi {
 
   _getJsonFromResponse(response) {
     if (!response.ok) {
-      return Promise.reject(`Ошибка: ${response.status}`);
+      return this._formError(response);
     }
 
-    return response.json();
+    return response.json().then(({data}) => data);
   }
 
   _getOkStatusFromResponse(response) {
-    return response.ok || Promise.reject(`Ошибка: ${response.status}`);
+    return response.ok || this._formError(response);
+  }
+
+  _formError(response) {
+    return response.json().then(({message}) => Promise.reject(new FetchError(response.status, message)));
   }
 }
 
