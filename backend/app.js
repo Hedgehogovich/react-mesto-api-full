@@ -5,6 +5,9 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, Segments } = require('celebrate');
+
+require('dotenv').config();
+
 const usersRoutes = require('./routes/users');
 const cardsRoutes = require('./routes/cards');
 const guestMiddleware = require('./middlewares/guest');
@@ -13,8 +16,6 @@ const notFoundMiddleware = require('./middlewares/notFound');
 const { BASE_API_DOMAIN, IS_PRODUCTION } = require('./utils/constants');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUser, login } = require('./controllers/users');
-
-require('dotenv').config();
 
 const app = express();
 app.use(express.json());
