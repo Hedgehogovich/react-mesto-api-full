@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { ENCRYPTION_KEY } = require('../utils/constants');
 const { FORBIDDEN } = require('../utils/httpsErrorCodes');
 
 module.exports = (req, res, next) => {
@@ -11,7 +12,7 @@ module.exports = (req, res, next) => {
   }
 
   try {
-    jwt.verify(token, process.env.ENCRYPTION_KEY);
+    jwt.verify(token, ENCRYPTION_KEY);
     res.status(FORBIDDEN).send({ message: 'Доступ запрещён' });
   } catch (err) {
     next();

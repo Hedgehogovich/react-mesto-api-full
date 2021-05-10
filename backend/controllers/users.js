@@ -5,7 +5,7 @@ const User = require('../models/user');
 const { ConflictError } = require('../utils/errors/ConflictError');
 const { UnauthorizedError } = require('../utils/errors/UnauthorizedError');
 const { BadRequestError } = require('../utils/errors/BadRequestError');
-const { BCRYPT_SALT_ROUNDS, MONGODB_DUPLICATE_ERROR_CODE } = require('../utils/constants');
+const { BCRYPT_SALT_ROUNDS, MONGODB_DUPLICATE_ERROR_CODE, ENCRYPTION_KEY } = require('../utils/constants');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -118,7 +118,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        process.env.ENCRYPTION_KEY,
+        ENCRYPTION_KEY,
         { expiresIn: 604800 },
       );
 

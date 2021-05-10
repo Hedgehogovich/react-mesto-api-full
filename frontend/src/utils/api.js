@@ -1,4 +1,5 @@
 import IApi from './IApi';
+import {BASE_API_URL} from './utils';
 
 class Api extends IApi {
   getAuthorizedUser() {
@@ -66,9 +67,8 @@ class Api extends IApi {
 }
 
 export const api = new Api({
-  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-20',
+  baseUrl: BASE_API_URL,
   headers: {
-    authorization: 'ae67ccb6-ec53-41ab-bfce-d685e4f66069',
     'Content-Type': 'application/json'
   }
 });

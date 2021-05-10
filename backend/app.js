@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, Segments } = require('celebrate');
@@ -9,21 +10,31 @@ const cardsRoutes = require('./routes/cards');
 const guestMiddleware = require('./middlewares/guest');
 const errorMiddleware = require('./middlewares/error');
 const notFoundMiddleware = require('./middlewares/notFound');
+const { BASE_API_DOMAIN, IS_PRODUCTION } = require('./utils/constants');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUser, login } = require('./controllers/users');
 
 require('dotenv').config();
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-});
-
 const app = express();
 app.use(express.json());
-app.use(helmet());
 app.use(cookieParser());
-app.use(limiter);
+
+if (IS_PRODUCTION) {
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  });
+
+  app.use(helmet());
+  app.use(cors({
+    origin: BASE_API_DOMAIN,
+    optionsSuccessStatus: 200
+  }));
+  app.use(limiter);
+} else {
+  app.use(cors());
+}
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -33,9 +44,12 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.listen(3000);
+if (IS_PRODUCTION) {
+  app.use(requestLogger);
+}
+
 app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);
-app.use(requestLogger);
 
 app.post('/signin', guestMiddleware, celebrate({
   [Segments.BODY]: Joi.object().keys({
@@ -79,7 +93,9 @@ app.post('/signup', guestMiddleware, celebrate({
   }),
 }), createUser);
 
-app.use(errorLogger);
+if (IS_PRODUCTION) {
+  app.use(errorLogger);
+}
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

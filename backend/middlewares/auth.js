@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const {ENCRYPTION_KEY} = require('../utils/constants');
 
 module.exports = (req, res, next) => {
   const { jwt: token } = req.cookies;
@@ -12,7 +13,7 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, process.env.ENCRYPTION_KEY);
+    payload = jwt.verify(token, ENCRYPTION_KEY);
   } catch (err) {
     return res
       .status(401)

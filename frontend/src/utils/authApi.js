@@ -1,4 +1,5 @@
 import IApi from './IApi';
+import {BASE_API_URL} from './utils';
 
 class AuthApi extends IApi{
   signIn({email, password}) {
@@ -28,7 +29,7 @@ class AuthApi extends IApi{
 }
 
 export const authApi = new AuthApi({
-  baseUrl: 'https://auth.nomoreparties.co',
+  baseUrl: BASE_API_URL,
   headers: {
     'Content-Type': 'application/json'
   }
