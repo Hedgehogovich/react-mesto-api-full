@@ -9,8 +9,6 @@ const {
   BCRYPT_SALT_ROUNDS,
   MONGODB_DUPLICATE_ERROR_CODE,
   ENCRYPTION_KEY,
-  JWT_SESSION_COOKIE,
-  SET_COOKIE_PARAMS,
 } = require('../utils/constants');
 
 module.exports.getUsers = (req, res, next) => {
@@ -128,17 +126,9 @@ module.exports.login = (req, res, next) => {
         { expiresIn: 604800 },
       );
 
-      res.cookie(JWT_SESSION_COOKIE, token, {
-        maxAge: 604800,
-        ...SET_COOKIE_PARAMS,
-      }).end();
+      res.send({data: {token}});
     })
     .catch((err) => {
       next(new UnauthorizedError(err.message));
     });
-};
-
-module.exports.logout = (req, res) => {
-  res.clearCookie(JWT_SESSION_COOKIE, SET_COOKIE_PARAMS);
-  res.send(200);
 };

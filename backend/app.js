@@ -16,7 +16,7 @@ const notFoundMiddleware = require('./middlewares/notFound');
 const authMiddleware = require('./middlewares/auth');
 const { FRONTEND_ORIGIN, IS_PRODUCTION } = require('./utils/constants');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { createUser, login, logout } = require('./controllers/users');
+const { createUser, login } = require('./controllers/users');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -96,7 +96,6 @@ app.post('/signup', guestMiddleware, celebrate({
     }),
   }),
 }), createUser);
-app.post('/signout', authMiddleware, logout);
 
 if (IS_PRODUCTION) {
   app.use(errorLogger);

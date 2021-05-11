@@ -7,7 +7,7 @@ class AuthApi extends IApi{
       action: '/signin',
       method: 'POST',
       data: {email, password}
-    }).then(this._getOkStatusFromResponse);
+    }).then(this._getJsonFromResponse);
   }
 
   signUp({email, password}) {
@@ -18,17 +18,13 @@ class AuthApi extends IApi{
     }).then(this._getOkStatusFromResponse);
   }
 
-  getUser() {
+  getUser(token) {
     return this._makeRequest({
       action: '/users/me',
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
     }).then(this._getJsonFromResponse);
-  }
-
-  signOut() {
-    return this._makeRequest({
-      action: '/signout',
-      method: 'POST'
-    });
   }
 }
 

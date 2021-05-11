@@ -1,10 +1,12 @@
 import FetchError from './FetchError';
+import {JWT_SESSION_NAME} from './constants';
 
 class IApi {
   constructor({baseUrl, headers}) {
     this._baseUrl = baseUrl;
     this._headers = headers;
     this._makeRequest = this._makeRequest.bind(this);
+    this._makeAuthorizedRequest = this._makeAuthorizedRequest.bind(this);
     this._getJsonFromResponse = this._getJsonFromResponse.bind(this);
     this._getOkStatusFromResponse = this._getOkStatusFromResponse.bind(this);
     this._formError = this._formError.bind(this);
@@ -23,7 +25,6 @@ class IApi {
     const requestParams = {
       method,
       headers: {...this._headers, ...headers},
-      credentials: 'include'
     };
 
     let url = this._baseUrl + action;
@@ -37,6 +38,23 @@ class IApi {
     }
 
     return fetch(url, requestParams);
+  }
+
+  _makeAuthorizedRequest({
+    action,
+    method = 'GET',
+    headers = {},
+    data = null,
+  }) {
+    if (!headers.authorization) {
+      const token = localStorage.getItem(JWT_SESSION_NAME);
+
+      if (token) {
+        headers.authorization = `Bearer ${token}`;
+      }
+    }
+
+    return this._makeRequest({action, method, headers, data});
   }
 
   _getJsonFromResponse(response) {

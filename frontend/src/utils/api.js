@@ -3,13 +3,13 @@ import {BASE_API_URL} from './constants';
 
 class Api extends IApi {
   getCards() {
-    return this._makeRequest({
+    return this._makeAuthorizedRequest({
       action: '/cards',
     }).then(this._getJsonFromResponse);
   }
 
   updateProfile({name, about}) {
-    return this._makeRequest({
+    return this._makeAuthorizedRequest({
       action: '/users/me',
       method: 'PATCH',
       data: {name, about},
@@ -17,7 +17,7 @@ class Api extends IApi {
   }
 
   addCard({name, link}) {
-    return this._makeRequest({
+    return this._makeAuthorizedRequest({
       action: '/cards',
       method: 'POST',
       data: {name, link},
@@ -25,7 +25,7 @@ class Api extends IApi {
   }
 
   removeCard(cardId) {
-    return this._makeRequest({
+    return this._makeAuthorizedRequest({
       action: `/cards/${cardId}`,
       method: 'DELETE',
     }).then(this._getOkStatusFromResponse);
@@ -38,21 +38,21 @@ class Api extends IApi {
   }
 
   likeCard(cardId) {
-    return this._makeRequest({
+    return this._makeAuthorizedRequest({
       action: `/cards/likes/${cardId}`,
       method: 'PUT',
     }).then(this._getJsonFromResponse);
   }
 
   removeLikeFromCard(cardId) {
-    return this._makeRequest({
+    return this._makeAuthorizedRequest({
       action: `/cards/likes/${cardId}`,
       method: 'DELETE',
     }).then(this._getJsonFromResponse);
   }
 
   updateAvatar(avatar) {
-    return this._makeRequest({
+    return this._makeAuthorizedRequest({
       action: `/users/me/avatar`,
       method: 'PATCH',
       data: {avatar}

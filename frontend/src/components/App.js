@@ -21,6 +21,7 @@ import {api} from '../utils/api';
 import {authApi} from '../utils/authApi';
 
 import {BAD_REQUEST, CONFLICT, UNAUTHORIZED} from '../utils/httpStatuses';
+import {JWT_SESSION_NAME} from '../utils/constants';
 
 function App() {
   const history = useHistory();
@@ -52,6 +53,7 @@ function App() {
   const [cards, setCards] = useState([]);
 
   function resetAuthorization() {
+    localStorage.removeItem(JWT_SESSION_NAME);
     setCurrentUser(null);
     setCards([]);
   }
@@ -174,8 +176,7 @@ function App() {
     }
 
     setIsConfirmationRequestInProgress(true);
-    confirmationCallback()
-      .finally(() => setIsConfirmationRequestInProgress(false));
+    confirmationCallback();
   }
 
   function handleCardDeleteConfirmation(card) {
@@ -188,7 +189,8 @@ function App() {
         });
         setConfirmationCallback(null);
       })
-      .catch(handleAuthorizedRouteRequestError);
+      .catch(handleAuthorizedRouteRequestError)
+      .finally(() => setIsConfirmationRequestInProgress(false));
   }
 
   function handleCardDelete(card) {
@@ -216,13 +218,24 @@ function App() {
       .finally(() => setIsRegisterRequestInProcess(false));
   }
 
-  const authorizeUser = useCallback(() => {
-    return authApi.getUser()
-      .then(setCurrentUser)
-      .catch(resetAuthorization)
-      .finally(() => {
-        setIsLoginRequestInProcess(false);
-      });
+  const authorizeUser = useCallback((token) => {
+    if (!token) {
+      token = localStorage.getItem(JWT_SESSION_NAME)
+    }
+
+    if (token) {
+      authApi.getUser(token)
+        .then((userData) => {
+          setCurrentUser(userData);
+          setIsInitialLoadPerformed(true);
+        })
+        .catch(resetAuthorization)
+        .finally(() => {
+          setIsLoginRequestInProcess(false);
+        });
+    } else {
+      setIsInitialLoadPerformed(true);
+    }
   }, []);
 
   function handleLogin(formData) {
@@ -233,18 +246,20 @@ function App() {
     setIsLoginRequestInProcess(true);
 
     authApi.signIn(formData)
-      .then(authorizeUser)
-      .catch(handleGuestRouteRequestError)
-      .finally(() => setIsLoginRequestInProcess(false));
+      .then(({token}) => {
+        localStorage.setItem(JWT_SESSION_NAME, token);
+        authorizeUser(token);
+      })
+      .catch((error) => {
+        handleGuestRouteRequestError(error);
+        setIsLoginRequestInProcess(false)
+      });
   }
 
   function handleSignOutConfirmation() {
-    return authApi.signOut()
-      .then(() => {
-        setConfirmationCallback(null);
-        resetAuthorization();
-      })
-      .catch(handleAuthorizedRouteRequestError);
+    setConfirmationCallback(null);
+    setIsConfirmationRequestInProgress(false);
+    resetAuthorization();
   }
 
   function handleSignOut() {
@@ -261,9 +276,7 @@ function App() {
   }
 
   useEffect(() => {
-    authorizeUser().then(() => {
-      setIsInitialLoadPerformed(true);
-    });
+    authorizeUser();
   }, [authorizeUser]);
 
   useEffect(() => {
