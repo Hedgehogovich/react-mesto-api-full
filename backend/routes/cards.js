@@ -11,11 +11,13 @@ const {
 
 const cardIdValidator = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    cardId: Joi.string().alphanum().required().messages({
-      'any.required': 'Некорректный ID карточки',
-      'string.base': 'Некорректный ID карточки',
-      'string.alphanum': 'Некорректный ID карточки',
-    }),
+    cardId: Joi.string().length(24).hex().required()
+      .messages({
+        'any.required': 'Некорректный ID карточки',
+        'string.base': 'Некорректный ID карточки',
+        'string.length': 'Некорректный ID карточки',
+        'string.hex': 'Некорректный ID карточки',
+      }),
   }),
 });
 

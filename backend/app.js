@@ -13,7 +13,6 @@ const cardsRoutes = require('./routes/cards');
 const guestMiddleware = require('./middlewares/guest');
 const errorMiddleware = require('./middlewares/error');
 const notFoundMiddleware = require('./middlewares/notFound');
-const authMiddleware = require('./middlewares/auth');
 const { FRONTEND_ORIGIN, IS_PRODUCTION } = require('./utils/constants');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUser, login } = require('./controllers/users');
@@ -35,15 +34,15 @@ app.use(cors({
 }));
 
 if (IS_PRODUCTION) {
-  const limiter = rateLimit({
+  app.use(requestLogger);
+  app.use(helmet());
+
+  app.use(rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
-  });
-
-  app.use(helmet());
-  app.use(limiter);
-  app.use(requestLogger);
+  }));
 }
+
 app.listen(process.env.LISTEN_PORT || 3000);
 
 app.use('/users', usersRoutes);

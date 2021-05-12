@@ -13,11 +13,13 @@ router.get('/', authMiddleware, getUsers);
 router.get('/me', authMiddleware, findCurrentUser);
 router.get('/:userId', authMiddleware, celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    userId: Joi.string().alphanum().required().messages({
-      'any.required': 'Некорректный ID пользователя',
-      'string.base': 'Некорректный ID пользователя',
-      'string.alphanum': 'Некорректный ID пользователя',
-    }),
+    userId: Joi.string().length(24).hex().required()
+      .messages({
+        'any.required': 'Некорректный ID пользователя',
+        'string.base': 'Некорректный ID пользователя',
+        'string.length': 'Некорректный ID карточки',
+        'string.hex': 'Некорректный ID карточки',
+      }),
   }),
 }), findOneUser);
 router.patch('/me', authMiddleware, celebrate({

@@ -15,7 +15,7 @@ class AuthApi extends IApi{
       action: '/signup',
       method: 'POST',
       data: {email, password}
-    }).then(this._getOkStatusFromResponse);
+    }).then(this._getJsonFromResponse);
   }
 
   getUser(token) {

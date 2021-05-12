@@ -49,7 +49,7 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then(() => res.end())
+    .then(() => res.send({ data: { message: 'Вы успешно зарегистрировались!' } }))
     .catch((err) => {
       if (err instanceof MongoError && err.code === MONGODB_DUPLICATE_ERROR_CODE) {
         next(new ConflictError('Пользователь с таким Email уже существует'));
@@ -126,7 +126,7 @@ module.exports.login = (req, res, next) => {
         { expiresIn: 604800 },
       );
 
-      res.send({data: {token}});
+      res.send({ data: { token } });
     })
     .catch((err) => {
       next(new UnauthorizedError(err.message));

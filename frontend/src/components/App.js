@@ -197,9 +197,9 @@ function App() {
     setConfirmationCallback(() => () => handleCardDeleteConfirmation(card));
   }
 
-  function handleRegistrationSuccess() {
+  function handleRegistrationSuccess(message) {
+    setInfoTooltipMessage(message);
     setIsTooltipSuccessful(true);
-    setInfoTooltipMessage('Вы успешно зарегистрировались!');
   }
 
   function handleRegistration(formData) {
@@ -210,8 +210,8 @@ function App() {
     setIsRegisterRequestInProcess(true);
 
     authApi.signUp(formData)
-      .then(() => {
-        handleRegistrationSuccess();
+      .then(({message}) => {
+        handleRegistrationSuccess(message);
         history.push('/sign-in');
       })
       .catch(handleGuestRouteRequestError)
