@@ -10,7 +10,6 @@ require('dotenv').config();
 
 const usersRoutes = require('./routes/users');
 const cardsRoutes = require('./routes/cards');
-const guestMiddleware = require('./middlewares/guest');
 const errorMiddleware = require('./middlewares/error');
 const notFoundMiddleware = require('./middlewares/notFound');
 const { FRONTEND_ORIGIN, IS_PRODUCTION } = require('./utils/constants');
@@ -54,7 +53,7 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', guestMiddleware, celebrate({
+app.post('/signin', celebrate({
   [Segments.BODY]: Joi.object().keys({
     email: Joi.string().email().required().messages({
       'any.required': 'Поле Email является обязательным для заполнения',
@@ -67,7 +66,7 @@ app.post('/signin', guestMiddleware, celebrate({
     }),
   }),
 }), login);
-app.post('/signup', guestMiddleware, celebrate({
+app.post('/signup', celebrate({
   [Segments.BODY]: Joi.object().keys({
     email: Joi.string().email().required().messages({
       'any.required': 'Поле Email является обязательным для заполнения',
