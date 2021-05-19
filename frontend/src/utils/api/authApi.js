@@ -1,5 +1,5 @@
 import IApi from './IApi';
-import {BASE_API_URL} from './constants';
+import {BASE_API_URL} from '../constants';
 
 class AuthApi extends IApi{
   signIn({email, password}) {

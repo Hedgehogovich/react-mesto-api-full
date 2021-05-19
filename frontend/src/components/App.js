@@ -17,8 +17,8 @@ import InfoTooltip from './InfoTooltip';
 
 import CurrentUserContext from '../contexts/CurrentUserContext';
 
-import {api} from '../utils/api';
-import {authApi} from '../utils/authApi';
+import {api} from '../utils/api/api';
+import {authApi} from '../utils/api/authApi';
 
 import {BAD_REQUEST, CONFLICT, UNAUTHORIZED} from '../utils/httpStatuses';
 import {JWT_SESSION_NAME} from '../utils/constants';

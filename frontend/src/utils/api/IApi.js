@@ -1,5 +1,5 @@
-import FetchError from './FetchError';
-import {JWT_SESSION_NAME} from './constants';
+import FetchError from '../errors/FetchError';
+import {JWT_SESSION_NAME} from '../constants';
 
 class IApi {
   constructor({baseUrl, headers}) {
