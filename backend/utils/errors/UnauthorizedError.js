@@ -1,4 +1,4 @@
-const { UNAUTHORIZED } = require('../httpsErrorCodes');
+const { UNAUTHORIZED } = require('../httpStatuses');
 
 class UnauthorizedError extends Error {
   constructor(...props) {

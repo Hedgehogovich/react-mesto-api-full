@@ -4,7 +4,6 @@ const { MongoError } = require('mongodb');
 const User = require('../models/user');
 const { ConflictError } = require('../utils/errors/ConflictError');
 const { UnauthorizedError } = require('../utils/errors/UnauthorizedError');
-const { BadRequestError } = require('../utils/errors/BadRequestError');
 const {
   BCRYPT_SALT_ROUNDS,
   MONGODB_DUPLICATE_ERROR_CODE,
@@ -25,21 +24,6 @@ module.exports.createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
-
-  if (!password || !password.length) {
-    next(new BadRequestError('Не указан пароль'));
-    return;
-  }
-
-  if (password.length < 8) {
-    next(new BadRequestError('Пароль должен быть длиннее 8 символов'));
-    return;
-  }
-
-  if (!email || !email.length) {
-    next(new BadRequestError('Не указан Email'));
-    return;
-  }
 
   bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
     .then((hash) => User.create({
@@ -107,16 +91,6 @@ module.exports.editAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
-  if (!password || !password.length) {
-    next(new BadRequestError('Не указан пароль'));
-    return;
-  }
-
-  if (!email || !email.length) {
-    next(new BadRequestError('Не указан Email'));
-    return;
-  }
 
   User.findUserByCredentials(email, password)
     .then((user) => {

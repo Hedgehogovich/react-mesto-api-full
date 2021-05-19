@@ -1,4 +1,4 @@
-const { CONFLICT } = require('../httpsErrorCodes');
+const { CONFLICT } = require('../httpStatuses');
 
 class ConflictError extends Error {
   constructor(...props) {

@@ -1,4 +1,4 @@
-const { FORBIDDEN } = require('../httpsErrorCodes');
+const { FORBIDDEN } = require('../httpStatuses');
 
 class ForbiddenError extends Error {
   constructor(...props) {

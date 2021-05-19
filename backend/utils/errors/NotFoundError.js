@@ -1,4 +1,4 @@
-const { NOT_FOUND } = require('../httpsErrorCodes');
+const { NOT_FOUND } = require('../httpStatuses');
 
 class NotFoundError extends Error {
   constructor(...props) {

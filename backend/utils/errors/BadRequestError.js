@@ -1,4 +1,4 @@
-const { BAD_REQUEST } = require('../httpsErrorCodes');
+const { BAD_REQUEST } = require('../httpStatuses');
 
 class BadRequestError extends Error {
   constructor(...props) {

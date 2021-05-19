@@ -1,4 +1,4 @@
-const { INTERNAL_SERVER_ERROR } = require('../httpsErrorCodes');
+const { INTERNAL_SERVER_ERROR } = require('../httpStatuses');
 
 class InternalServerError extends Error {
   constructor(...props) {
