@@ -225,13 +225,10 @@ function App() {
 
     if (token) {
       authApi.getUser(token)
-        .then((userData) => {
-          setCurrentUser(userData);
-          setIsInitialLoadPerformed(true);
-        })
+        .then(setCurrentUser)
         .catch(resetAuthorization)
         .finally(() => {
-          setIsLoginRequestInProcess(false);
+          setIsInitialLoadPerformed(true);
         });
     } else {
       setIsInitialLoadPerformed(true);
