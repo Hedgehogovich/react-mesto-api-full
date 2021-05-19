@@ -266,6 +266,10 @@ function App() {
     setConfirmationCallback(() => handleSignOutConfirmation);
   }
 
+  function closeNotification() {
+    setInfoTooltipMessage('');
+  }
+
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
@@ -354,7 +358,7 @@ function App() {
         />
         <InfoTooltip
           message={infoTooltipMessage}
-          onClose={closeAllPopups}
+          onClose={closeNotification}
           isSuccessful={isTooltipSuccessful}
         />
       </CurrentUserContext.Provider>
